@@ -21,6 +21,9 @@ jobs:
         run: docker compose up --build -d --wait
       - name: Test dashboard and editor
         run: python3 scripts/smoke_docker.py
+      - name: Diagnose editor sandbox
+        if: failure()
+        run: docker compose exec -T --user betterhoster dashboard bwrap --unshare-pid --ro-bind /usr /usr --dir /proc --dev /dev -- /usr/bin/true
       - name: Stop test stack
         if: always()
         run: docker compose down --volumes --remove-orphans
