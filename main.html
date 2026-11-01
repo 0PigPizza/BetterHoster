@@ -16,7 +16,7 @@
     .item:focus-visible { outline: 2px solid #d5d5d5; outline-offset: -2px; }
     .item svg { width: 18px; height: 18px; flex: none; color: #bebebe; }
     body { display: flex; height: 100dvh; overflow: hidden; }
-    .servers { min-width: 0; min-height: 0; height: 100%; overflow-y: auto; overscroll-behavior: contain; flex: 1; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr)); align-content: start; gap: 16px; padding: 28px; }
+    .servers { min-width: 0; min-height: 0; height: 100%; overflow-y: auto; overscroll-behavior: contain; flex: 1; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr)); align-content: start; grid-auto-rows: max-content; gap: 16px; padding: 28px; }
     .servers[hidden] { display: none; }
     .create-server { aspect-ratio: 3 / 2; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 10px; padding: 16px; border: 1px solid #303030; border-radius: 10px; background: #1b1b1b; color: #ededed; font: inherit; cursor: pointer; }
     .create-server:hover { background: #383838; }
@@ -96,6 +96,16 @@
       .sidebar { padding-top: 12px; padding-bottom: 12px; }
       .sidebar .item { padding-top: 6px; padding-bottom: 6px; }
       .section-label { margin-bottom: 4px; }
+    }
+    @media (max-width: 600px) {
+      .sidebar { flex: 0 0 78px; width: 78px; padding: 16px 6px; }
+      .section-label { display: none; }
+      .sidebar .item { flex-direction: column; justify-content: center; gap: 4px; padding: 9px 2px; font-size: 10px; text-align: center; }
+      .sidebar .item:hover { transform: none; }
+      .servers { padding: 16px; gap: 12px; }
+      .server-card h2 { overflow-wrap: anywhere; }
+      .server-open { padding: 14px 14px 8px; }
+      .card-footer { padding: 0 14px 12px; }
     }
   </style>
 </head>

@@ -52,3 +52,6 @@ Always use this palette for the Minecraft server dashboard.
 - Do not add unrequested titles, branding, or sidebar text.
 
 - Use custom, themed dropdowns instead of native browser dropdown menus.
+
+## Git branches
+- Commit only to the `BETA` branch unless the user explicitly instructs otherwise.

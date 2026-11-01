@@ -31,6 +31,9 @@
     input { min-width: 0; flex: 1; border: 0; background: #202020; color: #ededed; padding: 13px 16px; font: inherit; }
     .send, .file-button, .back { border: 0; color: #ededed; background: #242424; padding: 11px 16px; cursor: pointer; font: inherit; }
     .send:hover, .file-button:hover, .back:hover { background: #383838; }
+    .files-expand { display: none; padding: 10px 12px; border: 0; border-bottom: 1px solid #303030; background: #242424; color: #ededed; font: inherit; text-align: right; cursor: pointer; }
+    #files-panel:fullscreen { display: flex; flex-direction: column; background: #111111; }
+    #files-panel:fullscreen .editor-frame { height: 0; min-height: 0; flex: 1; }
     .editor-frame { width: 100%; height: min(75vh, 900px); min-height: 480px; display: block; border: 0; background: #111111; }
     .file-bar { display: flex; gap: 12px; align-items: center; padding: 12px; border-bottom: 1px solid #303030; color: #888888; overflow-wrap: anywhere; }
     .file-button { display: block; width: 100%; text-align: left; background: transparent; border-radius: 0; border-bottom: 1px solid #303030; }
@@ -253,6 +256,35 @@
       .back-to-servers { margin-bottom: 6px; }
       .section-label { margin-bottom: 4px; }
     }
+    @media (max-width: 600px) {
+      .sidebar { flex: 0 0 78px; padding: 12px 6px; }
+      .sidebar-server { margin: -12px -6px 8px; padding: 10px 6px; flex-direction: column; gap: 4px; }
+      .sidebar-server-name { width: 100%; text-align: center; font-size: 10px; }
+      .sidebar-server-status { padding: 2px 5px; font-size: 9px; }
+      .section-label { display: none; }
+      .sidebar .item { flex-direction: column; justify-content: center; gap: 3px; padding: 7px 2px; font-size: 10px; text-align: center; }
+      .sidebar .item:hover { transform: none; }
+      .back-to-servers { margin-bottom: 6px; }
+      main { padding: 16px; }
+      .header h1 { overflow-wrap: anywhere; }
+      .version-form, .config-panel, .players-panel { padding: 16px; }
+      .detail-row { flex-wrap: wrap; gap: 8px; padding: 12px; }
+      .detail-label { width: 100%; }
+      .detail-value { min-width: 0; }
+      .library-tabs { flex-wrap: wrap; }
+      .modrinth-bar, .modrinth-content { padding: 12px; }
+      #mods-list .modpack-card, #curseforge-list .modpack-card, #plugins-list .modpack-card, #hangar-list .modpack-card { padding: 14px; gap: 12px; }
+      #mods-list .modpack-icon, #curseforge-list .modpack-icon, #plugins-list .modpack-icon, #hangar-list .modpack-icon { width: 48px; height: 48px; }
+      .addon-details { width: calc(100% - 24px); padding: 16px; }
+      .addon-details-icon { width: 56px; height: 56px; }
+      .files-expand { display: block; width: 100%; }
+      .editor-frame { height: calc(100dvh - 160px); min-height: 320px; }
+    }
+    @media (max-width: 600px) and (max-height: 600px) {
+      .sidebar-server { display: none; }
+      .sidebar .item { flex-direction: row; gap: 5px; padding: 5px 2px; }
+      .sidebar .item svg { width: 15px; height: 15px; }
+    }
   </style>
 </head>
 <body>
@@ -318,7 +350,7 @@
         <article class="monitor-card events"><h2>Warnings &amp; errors</h2><div class="event-list" id="event-list"><p class="empty-events">No warnings or errors.</p></div></article>
       </div>
     </section>
-    <section id="files-panel" class="panel" aria-label="Files" hidden><iframe id="vscode" class="editor-frame" title="VS Code server files" allow="clipboard-read; clipboard-write"></iframe></section>
+    <section id="files-panel" class="panel" aria-label="Files" hidden><button class="files-expand" id="files-expand" type="button">Expand editor</button><iframe id="vscode" class="editor-frame" title="VS Code server files" allow="clipboard-read; clipboard-write"></iframe></section>
   </main>
   <dialog id="inventory-dialog" class="inventory-dialog" aria-labelledby="inventory-title"><h2 id="inventory-title"></h2><p id="inventory-note" class="config-note"></p><div id="inventory-grid" class="inventory-grid"></div><button class="action" id="inventory-close" type="button">Close</button></dialog>
   <dialog id="addon-details" class="addon-details" aria-labelledby="addon-details-title"><div class="addon-details-header"><img id="addon-details-icon" class="addon-details-icon" alt=""><div><h2 id="addon-details-title" class="addon-details-title"></h2><p id="addon-details-author" class="addon-details-meta"></p><p id="addon-details-stats" class="addon-details-meta"></p></div></div><p id="addon-details-summary" class="addon-details-summary"></p><div id="addon-details-body" class="addon-details-body"></div><div class="addon-details-footer"><button id="addon-details-close" class="action config-save" type="button">Close</button><a id="addon-details-link" class="addon-details-link" target="_blank" rel="noopener noreferrer">Open project ↗</a></div></dialog>
@@ -327,6 +359,15 @@
   <dialog id="popup" aria-labelledby="popup-message"><p id="popup-message"></p><button class="action" id="popup-close" type="button">OK</button></dialog>
   <dialog id="eula-dialog" aria-labelledby="eula-heading"><h2 id="eula-heading">Minecraft EULA</h2><p>Please read and accept the <a href="https://www.minecraft.net/eula" target="_blank" rel="noopener">Minecraft EULA</a> before starting this server.</p><button class="action" id="eula-accept" type="button">Accept</button><button class="action" id="eula-cancel" type="button">Cancel</button></dialog>
   <script>
+    const filesPanel = document.getElementById('files-panel');
+    const filesExpand = document.getElementById('files-expand');
+    filesExpand.onclick = async () => {
+      try {
+        if (document.fullscreenElement === filesPanel) await document.exitFullscreen();
+        else await filesPanel.requestFullscreen();
+      } catch (_) { showError('Unable to expand the editor.'); }
+    };
+    document.addEventListener('fullscreenchange', () => { filesExpand.textContent = document.fullscreenElement === filesPanel ? 'Exit full screen' : 'Expand editor'; });
     const id = location.pathname.split('/').pop();
     const base = '/api/servers/' + encodeURIComponent(id);
     const popup = document.getElementById('popup');
