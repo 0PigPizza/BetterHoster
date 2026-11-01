@@ -19,7 +19,7 @@ RUN mkdir -p /app/.local-editor /app/servers \
        | tar -xz -C /app/.local-editor \
     && useradd --create-home --uid 1000 --shell /bin/bash betterhoster \
     && chown -R betterhoster:betterhoster /app
-COPY --chown=betterhoster:betterhoster *.py *.html schema.sql ./
+COPY --chown=betterhoster:betterhoster *.py *.html host-status.css host-status.js schema.sql ./
 COPY docker-entrypoint.sh /usr/local/bin/betterhoster-entrypoint
 RUN chmod +x /usr/local/bin/betterhoster-entrypoint
 EXPOSE 8000 8100-8119 25565-25575/tcp 19132-19142/udp

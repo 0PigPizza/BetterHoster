@@ -108,8 +108,18 @@
       .card-footer { padding: 0 14px 12px; }
     }
   </style>
+  <link rel="stylesheet" href="/host-status.css">
+  <script defer src="/host-status.js"></script>
 </head>
 <body>
+  <header class="host-bar" data-state="loading" aria-label="Host status">
+    <div class="host-health"><span class="host-dot" aria-hidden="true"></span><span>Host</span><span data-host-state role="status">Connecting</span></div>
+    <div class="host-metrics">
+      <div class="host-metric"><span class="host-label">CPU</span><span class="host-value" data-host-cpu>—</span></div>
+      <div class="host-metric"><span class="host-label">Memory</span><span class="host-value" data-host-memory>—</span></div>
+      <div class="host-metric"><span class="host-label">Disk</span><span class="host-value" data-host-disk>—</span></div>
+    </div>
+  </header>
   <aside class="sidebar" aria-label="Dashboard menu">
     <div class="section-label">Dashboard</div>
     <button class="item" type="button" id="servers-button" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="7" rx="2"/><rect x="3" y="13" width="18" height="7" rx="2"/><path d="M7 7.5h.01M7 16.5h.01"/></svg><span>Servers</span></button>

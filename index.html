@@ -89,8 +89,18 @@
       .editions { flex-wrap: wrap; }
     }
   </style>
+  <link rel="stylesheet" href="/host-status.css">
+  <script defer src="/host-status.js"></script>
 </head>
 <body>
+  <header class="host-bar" data-state="loading" aria-label="Host status">
+    <div class="host-health"><span class="host-dot" aria-hidden="true"></span><span>Host</span><span data-host-state role="status">Connecting</span></div>
+    <div class="host-metrics">
+      <div class="host-metric"><span class="host-label">CPU</span><span class="host-value" data-host-cpu>—</span></div>
+      <div class="host-metric"><span class="host-label">Memory</span><span class="host-value" data-host-memory>—</span></div>
+      <div class="host-metric"><span class="host-label">Disk</span><span class="host-value" data-host-disk>—</span></div>
+    </div>
+  </header>
   <aside class="sidebar" aria-label="Server dashboard menu">
     <div class="section-label">Server</div>
     <button class="item" type="button" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg><span>Create</span></button>

@@ -10,6 +10,7 @@ from pathlib import Path
 from urllib.parse import urlsplit, parse_qs
 
 import pymysql
+import psutil
 import minecraft_servers
 import server_versions
 import server_install_choice
@@ -107,6 +108,32 @@ class Handler(BaseHTTPRequestHandler):
                 self.respond(400, {"message": str(error) or "Unable to load the requested information."})
             except (OSError, KeyError, TypeError, StopIteration):
                 self.respond(503, {"message": "Unable to load the requested information."})
+            return
+        if parsed.path == "/api/host-status":
+            if not self.authenticated():
+                self.respond(401, {"message": "Please log in."})
+                return
+            try:
+                memory = psutil.virtual_memory()
+                storage = minecraft_servers.ROOT if minecraft_servers.ROOT.is_dir() else BASE
+                disk = psutil.disk_usage(str(storage))
+                self.respond(200, {"cpu_percent": psutil.cpu_percent(interval=0.15),
+                                   "memory_percent": memory.percent,
+                                   "disk_percent": disk.percent})
+            except (OSError, psutil.Error):
+                self.respond(503, {"message": "Unable to load host status."})
+            return
+        if parsed.path in ("/host-status.css", "/host-status.js"):
+            if not self.authenticated():
+                self.send_error(401)
+                return
+            data = (BASE / parsed.path.lstrip('/')).read_bytes()
+            self.send_response(200)
+            self.send_header("Content-Type", "text/css; charset=utf-8" if parsed.path.endswith('.css') else "text/javascript; charset=utf-8")
+            self.send_header("Content-Length", str(len(data)))
+            self.send_header("Cache-Control", "no-store")
+            self.end_headers()
+            self.wfile.write(data)
             return
         if self.path == "/api/servers":
             if not self.authenticated():

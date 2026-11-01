@@ -1,0 +1,33 @@
+/* The host bar stays visible while the dashboard content scrolls. */
+body {
+  display: grid;
+  grid-template-columns: 240px minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr);
+}
+.host-bar {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  min-width: 0;
+  padding: 12px 24px;
+  border-bottom: 1px solid #303030;
+  background: #161616;
+  color: #ededed;
+  font-size: 13px;
+}
+.host-health, .host-metric { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.host-health { flex: none; font-weight: 600; }
+.host-dot { width: 8px; height: 8px; flex: none; border-radius: 50%; background: #858585; }
+.host-bar[data-state="online"] .host-dot { background: #79a887; }
+.host-bar[data-state="offline"] .host-dot { background: #c77979; }
+.host-metrics { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 24px; }
+.host-label { color: #888888; }
+.host-value { color: #ededed; font-variant-numeric: tabular-nums; white-space: nowrap; }
+body > .sidebar { grid-column: 1; grid-row: 2; width: 100%; }
+body > main { grid-column: 2; grid-row: 2; }
+@media (max-width: 600px) {
+  body { grid-template-columns: 78px minmax(0, 1fr); }
+  .host-bar { display: grid; grid-template-columns: 1fr; gap: 8px; padding: 10px 12px; }
+  .host-metrics { gap: 6px 14px; font-size: 12px; }
+}
