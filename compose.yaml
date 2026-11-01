@@ -1,5 +1,6 @@
 services:
   dashboard:
+    image: betterhoster:1.0
     build:
       context: .
       platforms:

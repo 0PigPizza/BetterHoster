@@ -4,7 +4,7 @@ A Minecraft server dashboard for managing Java and Bedrock servers.
 
 ## Run with Docker
 
-Install Docker with Compose. On Windows, use Docker Desktop with Linux containers. The included image targets x86-64 Linux, and the Windows package runs it through Docker Desktop.
+Install Docker with Compose. On Windows, use Docker Desktop with Linux containers. The image targets x86-64 Linux.
 
 From this folder run:
 
@@ -12,7 +12,7 @@ From this folder run:
 docker compose up -d --build
 ```
 
-Open [http://127.0.0.1:8000/](http://127.0.0.1:8000/) and register the admin account. Alternatively, download and run `BetterHoster-Windows.exe` on Windows or `BetterHoster-Linux` on Linux. The executable contains the application files, starts the Compose stack, and opens the dashboard. On Linux, mark the downloaded file executable first (`chmod +x BetterHoster-Linux`).
+Open [http://127.0.0.1:8000/](http://127.0.0.1:8000/) and register the admin account.
 
 The Compose setup includes MariaDB, Java 25 and 17, and OpenVSCode Server. Database records, Minecraft servers, and editor profiles are stored in Docker volumes. To stop the app without deleting the data, run `docker compose down`.
 
@@ -20,4 +20,11 @@ The default published Minecraft ports are TCP 25565–25575 and UDP 19132–1914
 
 `BETTERHOSTER_DB_PASSWORD` can override the internal database password before the first startup. If changed later, the stored MariaDB credentials must also be updated.
 
-GitHub Actions builds the Docker image and produces Windows and Linux launcher executables. Docker is required because the dashboard and Minecraft servers run in Linux containers.
+For a prebuilt image, download `BetterHoster-Docker.tar.gz`, `compose.yaml`, and `schema.sql` from the release into the same folder, then run:
+
+```sh
+docker load -i BetterHoster-Docker.tar.gz
+docker compose up -d
+```
+
+GitHub Actions builds and tests the Docker image.
