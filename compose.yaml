@@ -27,6 +27,7 @@ services:
         condition: service_healthy
     security_opt:
       - seccomp:unconfined
+      - apparmor:unconfined
 
   database:
     image: mariadb:11.8
