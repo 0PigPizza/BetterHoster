@@ -9,7 +9,7 @@ permissions:
 
 jobs:
   docker:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     env:
       COMPOSE_PROJECT_NAME: betterhoster-ci
       BETTERHOSTER_HTTP_PORT: '18080'
