@@ -17,6 +17,11 @@ jobs:
       BETTERHOSTER_BEDROCK_PORTS: '19232-19242'
     steps:
       - uses: actions/checkout@v4
+      - name: Enable user namespaces on the ephemeral runner
+        run: |
+          if [ -e /proc/sys/kernel/apparmor_restrict_unprivileged_userns ]; then
+            sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+          fi
       - name: Build and start the Docker stack
         run: docker compose up --build -d --wait
       - name: Test dashboard and editor
