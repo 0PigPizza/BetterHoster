@@ -1,0 +1,12 @@
+.git
+.github
+.gitlab
+.env
+.venv
+__pycache__
+*.pyc
+.local-editor
+.local-tools
+servers
+helpers
+BuildTools.log.txt

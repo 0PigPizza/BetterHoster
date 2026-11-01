@@ -1,0 +1,51 @@
+services:
+  dashboard:
+    build:
+      context: .
+      platforms:
+        - linux/amd64
+    platform: linux/amd64
+    init: true
+    restart: unless-stopped
+    environment:
+      MYSQL_HOST: database
+      MYSQL_PORT: '3306'
+      MYSQL_DATABASE: betterhoster
+      MYSQL_USER: betterhoster
+      MYSQL_PASSWORD: ${BETTERHOSTER_DB_PASSWORD:-betterhoster}
+      BETTERHOSTER_SERVER_ADDRESS: ${BETTERHOSTER_SERVER_ADDRESS:-}
+    ports:
+      - "127.0.0.1:${BETTERHOSTER_HTTP_PORT:-8000}:8000"
+      - "127.0.0.1:8100-8119:8100-8119/tcp"
+      - "${BETTERHOSTER_JAVA_PORTS:-25565-25575}:${BETTERHOSTER_JAVA_PORTS:-25565-25575}/tcp"
+      - "${BETTERHOSTER_BEDROCK_PORTS:-19132-19142}:${BETTERHOSTER_BEDROCK_PORTS:-19132-19142}/udp"
+    volumes:
+      - server-data:/app/servers
+      - editor-profiles:/app/.local-editor/profiles
+    depends_on:
+      database:
+        condition: service_healthy
+    security_opt:
+      - seccomp:unconfined
+
+  database:
+    image: mariadb:11.8
+    restart: unless-stopped
+    environment:
+      MARIADB_RANDOM_ROOT_PASSWORD: '1'
+      MARIADB_DATABASE: betterhoster
+      MARIADB_USER: betterhoster
+      MARIADB_PASSWORD: ${BETTERHOSTER_DB_PASSWORD:-betterhoster}
+    volumes:
+      - database-data:/var/lib/mysql
+      - ./schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+
+volumes:
+  server-data:
+  editor-profiles:
+  database-data:

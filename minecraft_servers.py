@@ -118,6 +118,11 @@ def server_dir(server_id):
 
 
 def local_address():
+    configured = os.environ.get('BETTERHOSTER_SERVER_ADDRESS')
+    if configured:
+        return configured
+    if os.environ.get('BETTERHOSTER_IN_DOCKER') == '1':
+        return ''
     import socket
     try:
         with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:

@@ -1,0 +1,53 @@
+name: Build
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+    env:
+      COMPOSE_PROJECT_NAME: betterhoster-ci
+      BETTERHOSTER_HTTP_PORT: '18080'
+      BETTERHOSTER_JAVA_PORTS: '25665-25675'
+      BETTERHOSTER_BEDROCK_PORTS: '19232-19242'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build and start the Docker stack
+        run: docker compose up --build -d --wait
+      - name: Test dashboard and editor
+        run: python3 scripts/smoke_docker.py
+      - name: Stop test stack
+        if: always()
+        run: docker compose down --volumes --remove-orphans
+
+  distributions:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            platform: linux
+            artifact: BetterHoster-Linux
+          - os: windows-latest
+            platform: windows
+            artifact: BetterHoster-Windows
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate Python source
+        run: python -m compileall -q .
+      - name: Build distribution
+        run: python scripts/build_bundle.py --platform ${{ matrix.platform }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact }}
+          path: dist/*
+          if-no-files-found: error

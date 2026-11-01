@@ -74,16 +74,29 @@ def editor_url(server_id):
         token_file = profile / 'token'
         token_file.write_text(token)
         token_file.chmod(0o600)
-        with socket.socket() as listener:
-            listener.bind(('127.0.0.1', 0))
-            port = listener.getsockname()[1]
+        first = int(os.environ.get('BETTERHOSTER_EDITOR_PORT_MIN', '0'))
+        last = int(os.environ.get('BETTERHOSTER_EDITOR_PORT_MAX', str(first)))
+        if first and not 1024 <= first <= last <= 65535:
+            raise ValueError('Invalid editor port range.')
+        port = None
+        for candidate in range(first, last + 1):
+            try:
+                with socket.socket() as listener:
+                    listener.bind(('0.0.0.0' if first else '127.0.0.1', candidate))
+                    port = listener.getsockname()[1]
+                    break
+            except OSError:
+                continue
+        if port is None:
+            raise ValueError('No editor port is available.')
+        bind_host = '0.0.0.0' if first else '127.0.0.1'
         command = ['bwrap', '--unshare-pid', '--unshare-ipc', '--unshare-uts', '--ro-bind', '/usr', '/usr',
             '--symlink', 'usr/lib', '/lib', '--symlink', 'usr/lib64', '/lib64',
-            '--ro-bind', '/etc', '/etc', '--proc', '/proc', '--dev', '/dev', '--tmpfs', '/tmp',
+            '--ro-bind', '/etc', '/etc', *(['--dir', '/proc'] if os.environ.get('BETTERHOSTER_IN_DOCKER') == '1' else ['--proc', '/proc']), '--dev', '/dev', '--tmpfs', '/tmp',
             '--dir', '/home', '--dir', '/home/editor', '--bind', str(profile), '/home/editor',
             '--ro-bind', str(INSTALL), '/editor', '--bind', str(folder), '/workspace',
             '--setenv', 'HOME', '/home/editor', '--setenv', 'PATH', '/usr/bin',
-            '--chdir', '/workspace', '/editor/bin/openvscode-server', '--host', '127.0.0.1',
+            '--chdir', '/workspace', '/editor/bin/openvscode-server', '--host', bind_host,
             '--port', str(port), '--connection-token-file', '/home/editor/token',
             '--server-data-dir', '/home/editor/server', '--user-data-dir', '/home/editor',
             '--telemetry-level', 'off']

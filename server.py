@@ -332,4 +332,4 @@ if __name__ == "__main__":
                 minecraft_servers.start_server(server_id)
             except (ValueError, OSError) as error:
                 print(f'Unable to resume server {server_id}: {error}', file=sys.stderr)
-    ThreadingHTTPServer(("127.0.0.1", 8000), Handler).serve_forever()
+    ThreadingHTTPServer((os.environ.get("BETTERHOSTER_HOST", "127.0.0.1"), int(os.environ.get("BETTERHOSTER_PORT", "8000"))), Handler).serve_forever()
