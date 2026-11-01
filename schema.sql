@@ -1,0 +1,6 @@
+CREATE TABLE admins (
+    id TINYINT UNSIGNED NOT NULL PRIMARY KEY,
+    username VARCHAR(254) NOT NULL UNIQUE,
+    password_hash VARCHAR(255) NOT NULL,
+    CONSTRAINT one_admin CHECK (id = 1)
+) ENGINE=InnoDB;

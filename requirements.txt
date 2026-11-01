@@ -1,0 +1,6 @@
+argon2-cffi>=23.1,<26
+PyMySQL>=1.1,<2
+psutil>=5.9,<8
+mcstatus>=11,<13
+
+nbtlib>=2,<3
