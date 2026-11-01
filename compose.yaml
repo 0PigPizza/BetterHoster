@@ -1,3 +1,5 @@
+name: betterhoster
+
 services:
   dashboard:
     image: betterhoster:1.0

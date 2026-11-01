@@ -41,7 +41,10 @@ def compatible(version, info, game, project=None):
 
 
 def registry(server_id):
-    path = mc.server_dir(server_id) / '.yamch' / 'hangar-plugins.json'
+    folder = mc.server_dir(server_id)
+    path = folder / '.betterhoster' / 'hangar-plugins.json'
+    if not path.exists():
+        path = folder / '.yamch' / 'hangar-plugins.json'  # Read registries from older installations.
     try:
         value = json.loads(path.read_text())
         return value if isinstance(value, dict) else {}
@@ -60,7 +63,7 @@ def matching(server_id, project):
 
 
 def save_registry(server_id, data):
-    path = mc.server_dir(server_id) / '.yamch' / 'hangar-plugins.json'; path.parent.mkdir(exist_ok=True)
+    path = mc.server_dir(server_id) / '.betterhoster' / 'hangar-plugins.json'; path.parent.mkdir(exist_ok=True)
     fd, temporary = tempfile.mkstemp(prefix='.hangar-', dir=path.parent)
     try:
         with os.fdopen(fd, 'w') as out: json.dump(data, out)

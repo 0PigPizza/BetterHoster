@@ -36,7 +36,10 @@ def compatible(item, game, loaders):
 
 
 def registry(server_id):
-    path = mc.server_dir(server_id) / '.yamch' / 'curseforge-mods.json'
+    folder = mc.server_dir(server_id)
+    path = folder / '.betterhoster' / 'curseforge-mods.json'
+    if not path.exists():
+        path = folder / '.yamch' / 'curseforge-mods.json'  # Read registries from older installations.
     try:
         data = json.loads(path.read_text())
         if isinstance(data, dict): return data
@@ -87,7 +90,7 @@ def available_versions(server_id, project):
 
 
 def save_registry(server_id, data):
-    path = mc.server_dir(server_id) / '.yamch' / 'curseforge-mods.json'
+    path = mc.server_dir(server_id) / '.betterhoster' / 'curseforge-mods.json'
     path.parent.mkdir(exist_ok=True)
     fd, temporary = tempfile.mkstemp(prefix='.curseforge-', dir=path.parent)
     try:

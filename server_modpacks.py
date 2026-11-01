@@ -85,7 +85,7 @@ def install(server_id, project, version_id):
             raise ValueError('Stop the server before installing a modpack.')
         if original.get('software') == 'modpacks' and original.get('version') == version_id:
             raise ValueError('This modpack version is already installed.')
-        base = folder / '.yamch'
+        base = folder / '.betterhoster'
         base.mkdir(exist_ok=True)
         with tempfile.TemporaryDirectory(prefix='.modpack-', dir=base) as tmp:
             temp = Path(tmp)

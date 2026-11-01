@@ -94,13 +94,13 @@ def install(server_id, software, version, loader_version=None):
             raise ValueError('This version is already installed.')
         if not any(item['id'] == version for item in catalog(software)):
             raise ValueError('This version is no longer available.')
-        base = folder / '.yamch' / 'versions'
+        base = folder / '.betterhoster' / 'versions'
         base.mkdir(parents=True, exist_ok=True)
         install_id = uuid.uuid4().hex
         with tempfile.TemporaryDirectory(prefix='.install-', dir=base) as temporary:
             directory = Path(temporary)
             jar = directory / 'server.jar'
-            relative = f'.yamch/versions/{install_id}'
+            relative = f'.betterhoster/versions/{install_id}'
             if software in ('bedrock', 'bedrock-preview'):
                 kind = 'serverBedrockLinux' if software == 'bedrock' else 'serverBedrockPreviewLinux'
                 links = mc.fetch_json('https://net-secondary.web.minecraft-services.net/api/v1.0/download/links')['result']['links']
