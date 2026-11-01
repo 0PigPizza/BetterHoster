@@ -26,12 +26,38 @@ jobs:
         run: docker compose up --build -d --wait
       - name: Test dashboard and editor
         run: python3 scripts/smoke_docker.py
+      - name: Stop the first test stack
+        run: docker compose down --volumes --remove-orphans
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.27.3'
+      - name: Build and run the Linux executable
+        env:
+          CGO_ENABLED: '0'
+          BETTERHOSTER_PROJECT_NAME: betterhoster-launcher-ci
+          BETTERHOSTER_NO_BROWSER: '1'
+          XDG_CONFIG_HOME: ${{ runner.temp }}/betterhoster-launcher
+        run: |
+          python3 scripts/prepare_launcher.py
+          go build -trimpath -o "$RUNNER_TEMP/BetterHoster-Linux" ./launcher
+          "$RUNNER_TEMP/BetterHoster-Linux"
+      - name: Test the executable's stack
+        env:
+          COMPOSE_PROJECT_NAME: betterhoster-launcher-ci
+          XDG_CONFIG_HOME: ${{ runner.temp }}/betterhoster-launcher
+        run: |
+          cd "$XDG_CONFIG_HOME/BetterHoster"
+          python3 "$GITHUB_WORKSPACE/scripts/smoke_docker.py"
       - name: Diagnose editor sandbox
         if: failure()
         run: docker compose exec -T --user betterhoster dashboard bwrap --unshare-pid --ro-bind /usr /usr --dir /proc --dev /dev -- /usr/bin/true
       - name: Stop test stack
         if: always()
-        run: docker compose down --volumes --remove-orphans
+        run: |
+          docker compose down --volumes --remove-orphans
+          if [ -f "$RUNNER_TEMP/betterhoster-launcher/BetterHoster/compose.yaml" ]; then
+            docker compose --project-name betterhoster-launcher-ci -f "$RUNNER_TEMP/betterhoster-launcher/BetterHoster/compose.yaml" down --volumes --remove-orphans
+          fi
 
   distributions:
     strategy:
@@ -41,19 +67,30 @@ jobs:
           - os: ubuntu-latest
             platform: linux
             artifact: BetterHoster-Linux
+            output: BetterHoster-Linux
           - os: windows-latest
             platform: windows
             artifact: BetterHoster-Windows
+            output: BetterHoster-Windows.exe
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.27.3'
       - name: Validate Python source
         run: python -m compileall -q .
-      - name: Build distribution
-        run: python scripts/build_bundle.py --platform ${{ matrix.platform }}
+      - name: Prepare executable resources
+        run: python scripts/prepare_launcher.py
+      - name: Test executable resources
+        run: go test ./launcher
+      - name: Build executable
+        run: go build -trimpath -ldflags "-s -w" -o dist/${{ matrix.output }} ./launcher
+        env:
+          CGO_ENABLED: '0'
       - uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.artifact }}

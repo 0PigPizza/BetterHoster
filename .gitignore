@@ -49,3 +49,5 @@ app/migrations/status
 .local-tools/
 
 /dist/
+
+/launcher/payload/

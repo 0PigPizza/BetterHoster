@@ -12,7 +12,7 @@ From this folder run:
 docker compose up -d --build
 ```
 
-Open [http://127.0.0.1:8000/](http://127.0.0.1:8000/) and register the admin account. The Windows and Linux build archives also include a `start-windows.cmd` or `start-linux.sh` launcher.
+Open [http://127.0.0.1:8000/](http://127.0.0.1:8000/) and register the admin account. Alternatively, download and run `BetterHoster-Windows.exe` on Windows or `BetterHoster-Linux` on Linux. The executable contains the application files, starts the Compose stack, and opens the dashboard. On Linux, mark the downloaded file executable first (`chmod +x BetterHoster-Linux`).
 
 The Compose setup includes MariaDB, Java 25 and 17, and OpenVSCode Server. Database records, Minecraft servers, and editor profiles are stored in Docker volumes. To stop the app without deleting the data, run `docker compose down`.
 
@@ -20,4 +20,4 @@ The default published Minecraft ports are TCP 25565–25575 and UDP 19132–1914
 
 `BETTERHOSTER_DB_PASSWORD` can override the internal database password before the first startup. If changed later, the stored MariaDB credentials must also be updated.
 
-GitHub Actions builds the Docker image and produces Windows and Linux Docker-based distribution archives. These archives require Docker; they are not standalone native executables.
+GitHub Actions builds the Docker image and produces Windows and Linux launcher executables. Docker is required because the dashboard and Minecraft servers run in Linux containers.
